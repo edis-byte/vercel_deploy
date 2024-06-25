@@ -1,4 +1,5 @@
 const fs = require('fs').promises;
+const process = require('node:process');
 
 //FUNZIONI INTERNE, NON COLLEGATE A NESSUN ENDPOINT API
 const leggiBookDalFile =  () => {
@@ -18,7 +19,7 @@ const scriviBookSulFile = async (data) => {
     return true;
   } catch (error) {
     console.error('Errore scrittura su file!!!!!!!!!!!', error)
-    return false;
+    return  error;
   }
 };
 
@@ -26,11 +27,7 @@ const scriviBookSulFile = async (data) => {
 //FUNZIONI API 
 const findAll = async (req, res) => {
 
-fs.readdir(process.cwd()).then( (err, files) => {
-  files.forEach(file => {
-    console.log(file);
-  });
-});
+
   const data = await leggiBookDalFile();
   res.status(200).json(data);
 };
@@ -71,7 +68,7 @@ const postById = async (req, res) => {
 
 const updateById = async (req, res) => {
   const data = await leggiBookDalFile();
-  const indiceBookTrovato = data.books.findIndex(user => user.id === parseInt(id, 10));
+  const indiceBookTrovato = data.books.findIndex(book => book.id === parseInt(req.body.id, 10));
   if (indiceBookTrovato >= 0) {
       data.books[indiceBookTrovato] = req.body;
       await scriviBookSulFile(data);
